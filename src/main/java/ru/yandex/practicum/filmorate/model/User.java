@@ -1,0 +1,33 @@
+package ru.yandex.practicum.filmorate.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Past;
+import lombok.Data;
+
+import java.time.LocalDate;
+
+/**
+ * User
+ *
+ * @author Aleksei Smyshliaev
+ **/
+
+@Data
+public class User {
+    private Long id;
+
+    @Email(message = "E-mail имеет неверный формат.")
+    @NotEmpty(message = "E-mail не может быть пустым.")
+    private String email;
+
+    @NotEmpty(message = "Логин не может быть пустым.")
+    private String login;
+
+    private String name;
+
+    @Past(message = "День рождения не может быть в будущем.")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
+}

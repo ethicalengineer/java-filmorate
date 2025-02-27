@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * UserControllerTest
@@ -31,9 +31,34 @@ public class UserControllerTest {
                 " \"login\": \"engineer\"," +
                 " \"birthday\" : \"1946-08-20\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk());
+    }
+
+    @Test
+    public void createUserWithIncorrectLoginRequestTest() throws Exception {
+        String user = "{\"name\": \"Alex\"," +
+                " \"email\" : \"alex@alex.com\"," +
+                " \"login\": \"eng in eer\"," +
+                " \"birthday\" : \"1946-08-20\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createUserWithEmptyNameRequestTest() throws Exception {
+        String user = "{\"email\" : \"alex@alex.com\"," +
+                " \"login\": \"engineer\"," +
+                " \"birthday\" : \"1946-08-20\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk());
     }
 
     @Test
@@ -44,9 +69,34 @@ public class UserControllerTest {
                 " \"login\": \"doctor\"," +
                 " \"birthday\" : \"1946-08-20\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
-                        .content(user)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateUserWithIncorrectIdRequestTest() throws Exception {
+        String user = "{\"name\": \"Alex\"," +
+                " \"id\" : -1," +
+                " \"email\" : \"alex@alex.com\"," +
+                " \"login\": \"doctor\"," +
+                " \"birthday\" : \"1946-08-20\"}";
+        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateUserWithoutIdRequestTest() throws Exception {
+        String user = "{\"name\": \"Alex\"," +
+                " \"email\" : \"alex@alex.com\"," +
+                " \"login\": \"doctor\"," +
+                " \"birthday\" : \"1946-08-20\"}";
+        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -56,9 +106,9 @@ public class UserControllerTest {
                 " \"login\": \"engineer\"," +
                 " \"birthday\" : \"1991-05-15\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -67,9 +117,9 @@ public class UserControllerTest {
                 " \"login\": \"engineer\"," +
                 " \"birthday\" : \"1946-08-20\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -78,9 +128,9 @@ public class UserControllerTest {
                 " \"email\" : \"alex.com\"," +
                 " \"birthday\" : \"1946-08-20\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -90,15 +140,15 @@ public class UserControllerTest {
                 " \"login\": \"engineer\"," +
                 " \"birthday\" : \"2150-12-06\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(user)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isBadRequest());
     }
 
     @Test
     public void findAllUsersRequestTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/users")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk());
     }
 }

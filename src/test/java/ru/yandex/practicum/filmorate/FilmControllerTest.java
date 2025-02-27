@@ -31,9 +31,21 @@ public class FilmControllerTest {
                 " \"releaseDate\": \"1991-10-14\"," +
                 " \"duration\" : 200}";
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .content(film)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void createFilmWithIncorrectDateRequestTest() throws Exception {
+        String film = "{\"name\": \"Matrix\"," +
+                " \"description\" : \"Correct Description\"," +
+                " \"releaseDate\": \"1700-10-14\"," +
+                " \"duration\" : 200}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
@@ -44,9 +56,34 @@ public class FilmControllerTest {
                 " \"releaseDate\": \"1991-10-14\"," +
                 " \"duration\" : 200}";
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
-                        .content(film)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void updateFilmWithIncorrectIdRequestTest() throws Exception {
+        String film = "{\"name\": \"Matrix\"," +
+                " \"description\" : \"Another Description\"," +
+                " \"id\" : -1," +
+                " \"releaseDate\": \"1991-10-14\"," +
+                " \"duration\" : 200}";
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void updateFilmWithoutIdRequestTest() throws Exception {
+        String film = "{\"name\": \"Matrix\"," +
+                " \"description\" : \"Another Description\"," +
+                " \"releaseDate\": \"1991-10-14\"," +
+                " \"duration\" : 200}";
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
@@ -55,9 +92,9 @@ public class FilmControllerTest {
                 " \"releaseDate\": \"1991-10-14\"," +
                 " \"duration\" : 200}";
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .content(film)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
@@ -69,9 +106,9 @@ public class FilmControllerTest {
                 " \"releaseDate\": \"1991-10-14\"," +
                 " \"duration\" : 200}";
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .content(film)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
@@ -81,15 +118,15 @@ public class FilmControllerTest {
                 " \"releaseDate\": \"1991-10-14\"," +
                 " \"duration\" : -1}";
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
-                        .content(film)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
+               .content(film)
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     public void findAllFilmsRequestTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/films")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(200));
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

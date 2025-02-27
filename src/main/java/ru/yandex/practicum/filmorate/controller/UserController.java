@@ -22,6 +22,7 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
+    private long userId = 0;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -30,8 +31,8 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User newUser) {
-        userValidator(newUser);
-        newUser.setId(getNextId());
+        validateUser(newUser);
+        newUser.setId(++userId);
         users.put(newUser.getId(), newUser);
         log.info("Пользователь с ID {} успешно добавлен", newUser.getId());
         return newUser;
@@ -43,17 +44,17 @@ public class UserController {
             throw new ValidationException("Id обновляемого пользователя не задан.");
         }
 
-        if (users.containsKey(newUser.getId())) {
-            userValidator(newUser);
-
+        if (!users.containsKey(newUser.getId())) {
+            throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден.");
+        } else {
+            validateUser(newUser);
             users.put(newUser.getId(), newUser);
             log.info("Пользователь с ID {} успешно обновлен", newUser.getId());
             return newUser;
         }
-        throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден.");
     }
 
-    private void userValidator(User newUser) {
+    private void validateUser(User newUser) {
         if (newUser.getLogin().contains(" ")) {
             throw new ValidationException("Логин не может содержать пробелы.");
         }
@@ -62,14 +63,5 @@ public class UserController {
             newUser.setName(newUser.getLogin());
             log.info("Пустое отображаемое имя. Использован логин.");
         }
-    }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }

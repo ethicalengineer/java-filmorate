@@ -17,11 +17,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     private long filmId = 0;
 
     @Override
-    public void addFilm(Film newFilm) {
-        validateFilm(newFilm);
-        newFilm.setId(++filmId);
-        films.put(newFilm.getId(), newFilm);
-        log.info("Фильм с ID {} успешно добавлен", newFilm.getId());
+    public Film addFilm(Film film) {
+        validateFilm(film);
+        film.setId(++filmId);
+        films.put(film.getId(), film);
+        log.info("Фильм с ID {} успешно добавлен", film.getId());
+        return film;
     }
 
     @Override

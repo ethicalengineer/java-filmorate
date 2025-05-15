@@ -16,11 +16,12 @@ public class InMemoryUserStorage implements UserStorage {
     private long userId = 0;
 
     @Override
-    public void addUser(User user) {
+    public User addUser(User user) {
         validateUser(user);
         user.setId(++userId);
         users.put(user.getId(), user);
         log.info("Пользователь с ID {} успешно добавлен", user.getId());
+        return user;
     }
 
     @Override

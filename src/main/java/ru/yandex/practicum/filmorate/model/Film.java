@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Film
@@ -27,4 +28,6 @@ public class Film {
 
     @Positive(message = "Длительность должна быть больше нуля.")
     private int duration;
+
+    private Set<Long> userLikes;
 }

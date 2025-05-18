@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Past;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * User
@@ -30,4 +31,6 @@ public class User {
     @Past(message = "День рождения не может быть в будущем.")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
+
+    private Set<Long> friends;
 }

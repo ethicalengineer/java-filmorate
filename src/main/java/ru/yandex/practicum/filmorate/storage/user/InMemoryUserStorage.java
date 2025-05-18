@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 @Slf4j
@@ -19,6 +20,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User addUser(User user) {
         validateUser(user);
         user.setId(++userId);
+        user.setFriends(new HashSet<>());
         users.put(user.getId(), user);
         log.info("Пользователь с ID {} успешно добавлен", user.getId());
         return user;
@@ -54,6 +56,14 @@ public class InMemoryUserStorage implements UserStorage {
         return users;
     }
 
+    @Override
+    public User getUserById(long userId) {
+        if (!users.containsKey(userId)) {
+            throw new NotFoundException("Пользователь с ID " + userId + " не найден.");
+        }
+        return users.get(userId);
+    }
+
     private void validateUser(User newUser) {
         if (newUser.getLogin().contains(" ")) {
             throw new ValidationException("Логин не может содержать пробелы.");
@@ -62,6 +72,10 @@ public class InMemoryUserStorage implements UserStorage {
         if (newUser.getName() == null || newUser.getName().isEmpty()) {
             newUser.setName(newUser.getLogin());
             log.info("Пустое отображаемое имя. Использован логин.");
+        }
+
+        if (newUser.getFriends() == null) {
+            newUser.setFriends(new HashSet<>());
         }
     }
 }

@@ -7,18 +7,19 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.dto.user.UserMapperDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import static org.mockito.Mockito.when;
 
@@ -32,11 +33,14 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
 public class UserControllerTest {
-    @MockBean
-    private UserStorage userStorage;
-
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserService userService;
+
+    @MockitoBean
+    private UserMapperDTO mapper;
 
     private final ObjectMapper objectMapper;
 
@@ -65,7 +69,7 @@ public class UserControllerTest {
                 " \"birthday\" : \"1946-08-20\"}";
 
         User user = objectMapper.readValue(message, User.class);
-        when(userStorage.addUser(user)).thenThrow(ValidationException.class);
+        when(userService.createUpdateUser(user)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                .content(message)
@@ -107,7 +111,7 @@ public class UserControllerTest {
                 " \"birthday\" : \"1946-08-20\"}";
 
         User user = objectMapper.readValue(message, User.class);
-        when(userStorage.updateUser(user)).thenThrow(NotFoundException.class);
+        when(userService.createUpdateUser(user)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                .content(message)
@@ -123,7 +127,7 @@ public class UserControllerTest {
                 " \"birthday\" : \"1946-08-20\"}";
 
         User user = objectMapper.readValue(message, User.class);
-        when(userStorage.updateUser(user)).thenThrow(ValidationException.class);
+        when(userService.createUpdateUser(user)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                .content(message)

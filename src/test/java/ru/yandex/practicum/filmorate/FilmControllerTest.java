@@ -7,18 +7,20 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.dto.film.FilmMapperDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import static org.mockito.Mockito.when;
 
@@ -32,11 +34,17 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(FilmController.class)
 @AutoConfigureMockMvc
 public class FilmControllerTest {
-    @MockBean
-    private FilmStorage filmStorage;
-
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private FilmService filmService;
+
+    @MockitoBean
+    private FilmMapperDTO mapper;
+
+    @MockitoBean
+    private UserService userService;
 
     private final ObjectMapper objectMapper;
 
@@ -65,7 +73,7 @@ public class FilmControllerTest {
                 " \"duration\" : 200}";
 
         Film film = objectMapper.readValue(message, Film.class);
-        when(filmStorage.addFilm(film)).thenThrow(ValidationException.class);
+        when(filmService.createUpdateFilm(film)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                .content(message)
@@ -95,7 +103,7 @@ public class FilmControllerTest {
                 " \"duration\" : 200}";
 
         Film film = objectMapper.readValue(message, Film.class);
-        when(filmStorage.updateFilm(film)).thenThrow(NotFoundException.class);
+        when(filmService.createUpdateFilm(film)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                .content(message)
@@ -111,7 +119,7 @@ public class FilmControllerTest {
                 " \"duration\" : 200}";
 
         Film film = objectMapper.readValue(message, Film.class);
-        when(filmStorage.updateFilm(film)).thenThrow(ValidationException.class);
+        when(filmService.createUpdateFilm(film)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                .content(message)

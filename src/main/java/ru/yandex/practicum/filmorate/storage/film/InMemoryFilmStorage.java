@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -29,18 +30,15 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilm(long id) {
-        if (films.containsKey(id)) {
-            films.remove(id);
-            log.info("Фильм с ID {} успешно удален", id);
+        if (!films.containsKey(id)) {
+            throw new NotFoundException("Фильм с ID " + id + " не найден.");
         }
-        log.info("Фильм с ID {} не существует", id);
+        films.remove(id);
+        log.info("Фильм с ID {} успешно удален", id);
     }
 
     @Override
     public Film updateFilm(Film film) {
-        if (film.getId() == null) {
-            throw new ValidationException("Id обновляемого фильма не задан.");
-        }
         if (!films.containsKey(film.getId())) {
             throw new NotFoundException("Фильм с ID " + film.getId() + " не найден.");
         } else {
@@ -60,18 +58,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Map<Long, Film> findAll() {
-        return films;
+    public List<Film> findAll() {
+        return films.values().stream().toList();
     }
 
     private void validateFilm(Film newFilm) {
         if (newFilm.getReleaseDate() != null &&
                 newFilm.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата не может быть раньше 28.12.1895.");
-        }
-
-        if (newFilm.getUserLikes() == null) {
-            newFilm.setUserLikes(new HashSet<>());
         }
     }
 }

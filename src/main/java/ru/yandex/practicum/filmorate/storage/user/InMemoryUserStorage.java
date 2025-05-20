@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -28,19 +29,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void deleteUser(long id) {
-        if (users.containsKey(id)) {
-            users.remove(id);
-            log.info("Пользователь с ID {} успешно удален", id);
+        if (!users.containsKey(id)) {
+            throw new NotFoundException("Пользователь с ID " + id + " не найден.");
         }
-        log.info("Пользователь с ID {} не существует", id);
+        users.remove(id);
+        log.info("Пользователь с ID {} успешно удален", id);
     }
 
     @Override
     public User updateUser(User user) {
-        if (user.getId() == null) {
-            throw new ValidationException("Id обновляемого пользователя не задан.");
-        }
-
         if (!users.containsKey(user.getId())) {
             throw new NotFoundException("Пользователь с ID " + user.getId() + " не найден.");
         } else {
@@ -52,8 +49,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> findAll() {
-        return users;
+    public List<User> findAll() {
+        return users.values().stream().toList();
     }
 
     @Override
@@ -72,10 +69,6 @@ public class InMemoryUserStorage implements UserStorage {
         if (newUser.getName() == null || newUser.getName().isEmpty()) {
             newUser.setName(newUser.getLogin());
             log.info("Пустое отображаемое имя. Использован логин.");
-        }
-
-        if (newUser.getFriends() == null) {
-            newUser.setFriends(new HashSet<>());
         }
     }
 }

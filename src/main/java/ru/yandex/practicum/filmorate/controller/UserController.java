@@ -1,15 +1,16 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dto.user.UserMapperDTO;
+import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * UserController
@@ -19,49 +20,61 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
-    private long userId = 0;
+    private final UserService userService;
+    private final UserMapperDTO mapper;
 
     @GetMapping
-    public Collection<User> findAll() {
-        return users.values();
+    public List<UserDTO> getAllUsers() {
+        return userService.getUsers()
+                .stream()
+                .map(mapper::toUserDTO)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public UserDTO getUserById(@PathVariable long id) {
+        return mapper.toUserDTO(userService.getUser(id));
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<UserDTO> getUserFriends(@PathVariable long id) {
+        return userService.getUserFriends(id)
+                .stream()
+                .map(mapper::toUserDTO)
+                .toList();
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<UserDTO> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        return userService.getMutualFriends(id, otherId)
+                .stream()
+                .map(mapper::toUserDTO)
+                .toList();
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User newUser) {
-        validateUser(newUser);
-        newUser.setId(++userId);
-        users.put(newUser.getId(), newUser);
-        log.info("Пользователь с ID {} успешно добавлен", newUser.getId());
-        return newUser;
+    public UserDTO createUser(@Valid @RequestBody User user) {
+        return mapper.toUserDTO(userService.createUser(user));
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
-        if (newUser.getId() == null) {
+    public UserDTO updateUser(@Valid @RequestBody User user) {
+        if (user.getId() == null) {
             throw new ValidationException("Id обновляемого пользователя не задан.");
         }
-
-        if (!users.containsKey(newUser.getId())) {
-            throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден.");
-        } else {
-            validateUser(newUser);
-            users.put(newUser.getId(), newUser);
-            log.info("Пользователь с ID {} успешно обновлен", newUser.getId());
-            return newUser;
-        }
+        return mapper.toUserDTO(userService.updateUser(user));
     }
 
-    private void validateUser(User newUser) {
-        if (newUser.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может содержать пробелы.");
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public void makeFriends(@PathVariable long id, @PathVariable long friendId) {
+        userService.makeFriends(id, friendId);
+    }
 
-        if (newUser.getName() == null || newUser.getName().isEmpty()) {
-            newUser.setName(newUser.getLogin());
-            log.info("Пустое отображаемое имя. Использован логин.");
-        }
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.removeFriend(id, friendId);
     }
 }

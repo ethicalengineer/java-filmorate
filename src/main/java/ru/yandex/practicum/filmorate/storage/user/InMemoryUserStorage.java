@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
@@ -19,7 +18,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        validateUser(user);
         user.setId(++userId);
         user.setFriends(new HashSet<>());
         users.put(user.getId(), user);
@@ -41,7 +39,6 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(user.getId())) {
             throw new NotFoundException("Пользователь с ID " + user.getId() + " не найден.");
         } else {
-            validateUser(user);
             users.put(user.getId(), user);
             log.info("Пользователь с ID {} успешно обновлен", user.getId());
             return user;
@@ -59,16 +56,5 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь с ID " + userId + " не найден.");
         }
         return users.get(userId);
-    }
-
-    private void validateUser(User newUser) {
-        if (newUser.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может содержать пробелы.");
-        }
-
-        if (newUser.getName() == null || newUser.getName().isEmpty()) {
-            newUser.setName(newUser.getLogin());
-            log.info("Пустое отображаемое имя. Использован логин.");
-        }
     }
 }

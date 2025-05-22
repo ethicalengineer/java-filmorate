@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.dto.film.FilmMapperDTO;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
 
@@ -25,13 +24,14 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
-    private final UserService userService;
-
     private final FilmMapperDTO mapper;
 
     @GetMapping
     public List<FilmDTO> getAllFilms() {
-        return filmService.getFilms().stream().map(mapper::toFilmDTO).toList();
+        return filmService.getFilms()
+                .stream()
+                .map(mapper::toFilmDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -41,12 +41,15 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<FilmDTO> getPopular(@RequestParam(value = "count", defaultValue = "10") int count) {
-        return filmService.getPopularFilms(count).stream().map(mapper::toFilmDTO).toList();
+        return filmService.getPopularFilms(count)
+                .stream()
+                .map(mapper::toFilmDTO)
+                .toList();
     }
 
     @PostMapping
     public FilmDTO createFilm(@Valid @RequestBody Film film) {
-        return mapper.toFilmDTO(filmService.createUpdateFilm(film));
+        return mapper.toFilmDTO(filmService.createFilm(film));
     }
 
     @PutMapping
@@ -54,16 +57,16 @@ public class FilmController {
         if (film.getId() == null) {
             throw new ValidationException("Id обновляемого фильма не задан.");
         }
-        return mapper.toFilmDTO(filmService.createUpdateFilm(film));
+        return mapper.toFilmDTO(filmService.updateFilm(film));
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void likeFilm(@PathVariable long id, @PathVariable long userId) {
-        filmService.getFilm(id).addLike(userService.getUser(userId).getId());
+        filmService.likeFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLikeFromFilm(@PathVariable long id, @PathVariable long userId) {
-        filmService.getFilm(id).removeLike(userService.getUser(userId).getId());
+        filmService.removeLikeFromFilm(id, userId);
     }
 }

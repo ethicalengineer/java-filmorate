@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +18,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        validateFilm(film);
         film.setId(++filmId);
         film.setUserLikes(new HashSet<>());
         films.put(film.getId(), film);
@@ -42,7 +39,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!films.containsKey(film.getId())) {
             throw new NotFoundException("Фильм с ID " + film.getId() + " не найден.");
         } else {
-            validateFilm(film);
             films.put(film.getId(), film);
             log.info("Фильм с ID {} успешно обновлен", film.getId());
             return film;
@@ -62,10 +58,5 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values().stream().toList();
     }
 
-    private void validateFilm(Film newFilm) {
-        if (newFilm.getReleaseDate() != null &&
-                newFilm.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата не может быть раньше 28.12.1895.");
-        }
-    }
+
 }

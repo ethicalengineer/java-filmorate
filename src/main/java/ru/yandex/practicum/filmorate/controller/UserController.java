@@ -28,7 +28,10 @@ public class UserController {
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
-        return userService.getUsers().stream().map(mapper::toUserDTO).toList();
+        return userService.getUsers()
+                .stream()
+                .map(mapper::toUserDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -38,17 +41,23 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public List<UserDTO> getUserFriends(@PathVariable long id) {
-        return userService.getUserFriends(id).stream().map(mapper::toUserDTO).toList();
+        return userService.getUserFriends(id)
+                .stream()
+                .map(mapper::toUserDTO)
+                .toList();
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<UserDTO> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
-        return userService.getMutualFriends(id, otherId).stream().map(mapper::toUserDTO).toList();
+        return userService.getMutualFriends(id, otherId)
+                .stream()
+                .map(mapper::toUserDTO)
+                .toList();
     }
 
     @PostMapping
     public UserDTO createUser(@Valid @RequestBody User user) {
-        return mapper.toUserDTO(userService.createUpdateUser(user));
+        return mapper.toUserDTO(userService.createUser(user));
     }
 
     @PutMapping
@@ -56,18 +65,16 @@ public class UserController {
         if (user.getId() == null) {
             throw new ValidationException("Id обновляемого пользователя не задан.");
         }
-        return mapper.toUserDTO(userService.createUpdateUser(user));
+        return mapper.toUserDTO(userService.updateUser(user));
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void makeFriends(@PathVariable long id, @PathVariable long friendId) {
-        userService.getUser(id).addFriend(friendId);
-        userService.getUser(friendId).addFriend(id);
+        userService.makeFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
-        userService.getUser(id).removeFriend(userService.getUser(friendId).getId());
-        userService.getUser(friendId).removeFriend(userService.getUser(id).getId());
+        userService.removeFriend(id, friendId);
     }
 }

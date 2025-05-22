@@ -20,7 +20,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
 
 import static org.mockito.Mockito.when;
 
@@ -42,9 +41,6 @@ public class FilmControllerTest {
 
     @MockitoBean
     private FilmMapperDTO mapper;
-
-    @MockitoBean
-    private UserService userService;
 
     private final ObjectMapper objectMapper;
 
@@ -73,7 +69,7 @@ public class FilmControllerTest {
                 " \"duration\" : 200}";
 
         Film film = objectMapper.readValue(message, Film.class);
-        when(filmService.createUpdateFilm(film)).thenThrow(ValidationException.class);
+        when(filmService.createFilm(film)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                .content(message)
@@ -103,7 +99,7 @@ public class FilmControllerTest {
                 " \"duration\" : 200}";
 
         Film film = objectMapper.readValue(message, Film.class);
-        when(filmService.createUpdateFilm(film)).thenThrow(NotFoundException.class);
+        when(filmService.updateFilm(film)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                .content(message)
@@ -119,7 +115,7 @@ public class FilmControllerTest {
                 " \"duration\" : 200}";
 
         Film film = objectMapper.readValue(message, Film.class);
-        when(filmService.createUpdateFilm(film)).thenThrow(ValidationException.class);
+        when(filmService.updateFilm(film)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                .content(message)

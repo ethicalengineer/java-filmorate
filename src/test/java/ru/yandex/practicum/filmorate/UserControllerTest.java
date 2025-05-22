@@ -69,7 +69,7 @@ public class UserControllerTest {
                 " \"birthday\" : \"1946-08-20\"}";
 
         User user = objectMapper.readValue(message, User.class);
-        when(userService.createUpdateUser(user)).thenThrow(ValidationException.class);
+        when(userService.createUser(user)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                .content(message)
@@ -111,7 +111,7 @@ public class UserControllerTest {
                 " \"birthday\" : \"1946-08-20\"}";
 
         User user = objectMapper.readValue(message, User.class);
-        when(userService.createUpdateUser(user)).thenThrow(NotFoundException.class);
+        when(userService.updateUser(user)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                .content(message)
@@ -127,7 +127,7 @@ public class UserControllerTest {
                 " \"birthday\" : \"1946-08-20\"}";
 
         User user = objectMapper.readValue(message, User.class);
-        when(userService.createUpdateUser(user)).thenThrow(ValidationException.class);
+        when(userService.updateUser(user)).thenThrow(ValidationException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                .content(message)

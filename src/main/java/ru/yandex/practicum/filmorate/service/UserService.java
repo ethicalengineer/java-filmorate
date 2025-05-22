@@ -35,6 +35,7 @@ public class UserService {
         validateUser(user);
         return userStorage.updateUser(user);
     }
+
     public List<User> getMutualFriends(long firstUser, long secondUser) {
         Set<Long> mutualFriendsIds = new HashSet<>(userStorage.getUserById(firstUser).getFriends());
         mutualFriendsIds.retainAll(userStorage.getUserById(secondUser).getFriends());

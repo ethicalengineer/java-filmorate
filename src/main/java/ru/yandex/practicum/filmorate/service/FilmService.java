@@ -32,10 +32,12 @@ public class FilmService {
         validateFilm(film);
         return filmStorage.addFilm(film);
     }
+
     public Film updateFilm(Film film) {
         validateFilm(film);
         return filmStorage.updateFilm(film);
     }
+
     public void likeFilm(long filmId, long userId) {
         getFilm(filmId).addLike(userService.getUser(userId).getId());
     }
